@@ -2,23 +2,27 @@ package com.evensberget.accounting.service.institution
 
 import com.evensberget.accounting.common.database.DbUtils
 import com.evensberget.accounting.connector.nordigen.domain.NordigenInstitution
+import com.evensberget.accounting.service.country.CountryService
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
 class InstitutionRepository(
-    private val template: NamedParameterJdbcTemplate
+    private val template: NamedParameterJdbcTemplate,
+    private val countryService: CountryService
 ) {
 
     private val upsertSql = """
-        INSERT INTO institution(external_id, nordigen_id, bic, transaction_total_days, logo)
+        INSERT INTO institution(external_id, nordigen_id, bic, name, transaction_total_days, logo)
         VALUES (:externalId,
                 :nordigenId,
                 :bic,
+                :name,
                 :transactionTotalDays,
                 :logo)
         ON CONFLICT (nordigen_id) DO UPDATE SET bic = :bic,
+                                                name = :name,
                                                 transaction_total_days = :transactionTotalDays,
                                                 logo = :logo
     """.trimIndent()
@@ -37,13 +41,17 @@ class InstitutionRepository(
             DbUtils.sqlParameters(
                 "externalId" to UUID.randomUUID(),
                 "nordigenId" to it.id,
+                "name" to it.name,
                 "bic" to it.bic,
                 "transactionTotalDays" to it.transactionTotalDays,
                 "logo" to it.logo
             )
         }.toTypedArray())
 
+        updateInstitutuionCountryConnections(institutions)
+    }
 
+    private fun updateInstitutuionCountryConnections(institutions: List<NordigenInstitution>) {
         val pairs = mutableListOf<Pair<String, String>>()
 
         institutions.forEach { institution ->
@@ -51,6 +59,8 @@ class InstitutionRepository(
                 pairs.add(Pair(institution.id, country))
             }
         }
+
+        pairs.forEach { countryService.getCountryByISO3166(it.second) }
 
         val parameters = pairs.map {
             DbUtils.sqlParameters(

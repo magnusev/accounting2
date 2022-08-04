@@ -1,11 +1,12 @@
 CREATE TABLE institution
 (
     id                     SERIAL PRIMARY KEY,
-    external_id            uuid UNIQUE NOT NULL,
-    nordigen_id            VARCHAR UNIQUE NOT NULL ,
+    external_id            uuid UNIQUE    NOT NULL,
+    nordigen_id            VARCHAR UNIQUE NOT NULL,
+    name                   VARCHAR        NOT NULL,
     bic                    VARCHAR,
-    transaction_total_days VARCHAR     NOT NULL,
-    logo                   VARCHAR     NOT NULL
+    transaction_total_days VARCHAR        NOT NULL,
+    logo                   VARCHAR        NOT NULL
 );
 
 CREATE TABLE institution_country
