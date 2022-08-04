@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.benmanes.caffeine.cache.Caffeine
 import org.springframework.stereotype.Service
-import java.io.File
 import java.time.Duration
 import java.util.*
 
@@ -39,10 +38,13 @@ class CountryService(
             @JsonProperty("alpha-3") val alpha3: String
         )
 
-        val string = File("data/countries.json").readText(Charsets.UTF_8)
+        val countriesStream = this.javaClass.classLoader.getResourceAsStream("countries.json")
 
-        val country = JsonUtils.fromJson(string, Array<CountryFileEntry>::class.java)
+        val country = JsonUtils.fromJson(countriesStream, Array<CountryFileEntry>::class.java)
             .first { it.alpha2 == code }
+
+//        val string = File("data/countries.json").readText(Charsets.UTF_8)
+
 
         val newCountry = Country(
             id = UUID.randomUUID(),

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import java.io.InputStream
 
 object JsonUtils {
 
@@ -27,8 +28,11 @@ object JsonUtils {
         return mapper.readValue(jsonStr, clazz)
     }
 
+    fun <T> fromJson(stream: InputStream, clazz: Class<T>): T {
+        return mapper.readValue(stream, clazz)
+    }
+
     fun toJson(any: Any): String {
         return mapper.writeValueAsString(any)
     }
-
 }

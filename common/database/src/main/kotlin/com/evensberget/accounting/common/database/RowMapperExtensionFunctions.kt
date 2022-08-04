@@ -3,6 +3,8 @@ package com.evensberget.accounting.common.database
 import java.sql.ResultSet
 import java.time.*
 import java.util.*
+import java.util.stream.Collectors
+
 
 fun ResultSet.getUUID(columnLabel: String): UUID {
     return getNullableUUID(columnLabel) ?: throw IllegalStateException("Expected $columnLabel not to be null")
@@ -14,7 +16,8 @@ fun ResultSet.getNullableUUID(columnLabel: String): UUID? {
 }
 
 fun <T> ResultSet.getSet(columnLabel: String): Set<T> {
-    return setOf(this.getArray(columnLabel).array) as Set<T>
+    return Arrays.stream(this.getArray(columnLabel).array as Array<T>)
+        .collect(Collectors.toSet())
 }
 
 fun ResultSet.getLocalDateTime(columnLabel: String): LocalDateTime {
