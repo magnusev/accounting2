@@ -1,3 +1,5 @@
+package com.evensberget.accounting.common.domain
+
 import java.util.*
 
 data class Country(

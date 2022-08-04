@@ -1,6 +1,6 @@
 package com.evensberget.accounting.service.country
 
-import Country
+import com.evensberget.accounting.common.domain.Country
 import com.evensberget.accounting.common.database.DbUtils
 import com.evensberget.accounting.common.database.getUUID
 import org.springframework.jdbc.core.RowMapper

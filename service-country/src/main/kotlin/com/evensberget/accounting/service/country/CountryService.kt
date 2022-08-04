@@ -1,6 +1,6 @@
 package com.evensberget.accounting.service.country
 
-import Country
+import com.evensberget.accounting.common.domain.Country
 import com.evensberget.accounting.common.json.JsonUtils
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty

@@ -1,17 +1,17 @@
 package com.evensberget.accounting
 
-import com.evensberget.accounting.service.institution.InstitutionService
+import com.evensberget.accounting.service.user.UserService
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
 open class AccountingApplication(
-    private val institutionService: InstitutionService
+    private val userService: UserService
 ) : CommandLineRunner {
 
     override fun run(vararg args: String?) {
-        val institutions = institutionService.getAll()
+        val user = userService.get("magnus.evensberget@gmail.com")
         println()
     }
 }

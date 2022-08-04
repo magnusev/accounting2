@@ -17,7 +17,7 @@ class InstitutionService(
 
     @EventListener(ApplicationReadyEvent::class)
     fun startup() {
-        updateInstitutions()
+//        updateInstitutions()
     }
 
     fun updateInstitutions() {
