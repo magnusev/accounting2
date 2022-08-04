@@ -1,0 +1,18 @@
+postgres:
+  host: localhost
+  port: 5432
+  username: user
+  password: password
+  database: accounting-service
+
+nordingen:
+  secret:
+    id: "0856df4f-2e71-45fb-83fd-e0179c86ff59"
+    key: "654d1f81d139ca959c665e4f9fe6a25b981005820d6d354ca8e06c47a62a0ca5104a5de2ba95ba1a975bb7676d7ff217632f249c35e6d777f1bc0c7f2fedc9ef"
+
+spring:
+  datasource:
+    name: local-datasource
+    url: jdbc:postgresql://${postgres.host}:${postgres.port}/${postgres.database}
+    username: ${postgres.username}
+    password: ${postgres.password}
