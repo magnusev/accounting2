@@ -13,6 +13,10 @@ fun ResultSet.getNullableUUID(columnLabel: String): UUID? {
         ?.let { UUID.fromString(it) }
 }
 
+fun <T> ResultSet.getSet(columnLabel: String): Set<T> {
+    return setOf(this.getArray(columnLabel).array) as Set<T>
+}
+
 fun ResultSet.getLocalDateTime(columnLabel: String): LocalDateTime {
     return getNullableLocalDateTime(columnLabel) ?: throw IllegalStateException("Expected $columnLabel not to be null")
 }

@@ -5,6 +5,8 @@ import com.evensberget.accounting.common.domain.TransactionStatus
 import com.evensberget.accounting.common.json.JsonUtils
 import com.evensberget.accounting.connector.nordigen.components.NordigenAccesTokenComponent
 import com.evensberget.accounting.connector.nordigen.domain.NordigenInstitution
+import com.evensberget.accounting.connector.nordigen.dto.EndUserAgreementRequest
+import com.evensberget.accounting.connector.nordigen.dto.EndUserAgreementResponse
 import com.evensberget.accounting.connector.nordigen.dto.InstitutionsResponse
 import com.evensberget.accounting.connector.nordigen.dto.TransactionsResponse
 import org.springframework.http.HttpEntity
@@ -35,6 +37,26 @@ class NordigenConnectorService(
             ?: throw UnsupportedOperationException("Body should not be null")
 
         return data.map { it.toNordigenInstitution() }
+    }
+
+    fun getEnduserAgreement(institutionId: String): EndUserAgreementResponse {
+        val url = "https://ob.nordigen.com/api/v2/agreements/enduser/"
+
+        val headers = HttpHeaders()
+        headers.set("accept", "application/json")
+        headers.set("Content-Type", "application/json")
+        headers.set("Authorization", "Bearer ${accessToken.getToken()}")
+
+        val body = EndUserAgreementRequest(
+            institution_id = institutionId,
+            max_historical_days = 730,
+            access_valid_for_days = 30,
+            access_scope = listOf("balances", "details", "transactions")
+        )
+
+        val entity = HttpEntity(body, headers)
+
+        return template.postForObject(url, entity, EndUserAgreementResponse::class.java)
     }
 
     fun getTransactions(): List<Transaction> {

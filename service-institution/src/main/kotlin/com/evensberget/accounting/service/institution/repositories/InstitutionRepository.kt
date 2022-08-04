@@ -1,8 +1,10 @@
-package com.evensberget.accounting.service.institution
+package com.evensberget.accounting.service.institution.repositories
 
 import com.evensberget.accounting.common.database.DbUtils
+import com.evensberget.accounting.common.domain.Institution
 import com.evensberget.accounting.connector.nordigen.domain.NordigenInstitution
 import com.evensberget.accounting.service.country.CountryService
+import com.evensberget.accounting.service.institution.repositories.queries.InstitutionQuery
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
 import java.util.*
@@ -51,6 +53,13 @@ class InstitutionRepository(
         updateInstitutuionCountryConnections(institutions)
     }
 
+    fun getNordigenIdForInstitution(id: UUID): String {
+        return template.query(
+            "SELECT * FROM institution WHERE external_id = :id",
+            DbUtils.sqlParameters("id" to id)
+        ) { rs, _ -> rs.getString("nordigen_id") }.first()
+    }
+
     private fun updateInstitutuionCountryConnections(institutions: List<NordigenInstitution>) {
         val pairs = mutableListOf<Pair<String, String>>()
 
@@ -70,6 +79,11 @@ class InstitutionRepository(
         }.toTypedArray()
 
         template.batchUpdate(connectCountriesSql, parameters)
+    }
+
+    fun getByName(name: String): Institution {
+        return InstitutionQuery(template)
+            .getByName(name)
     }
 
 }
