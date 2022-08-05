@@ -1,9 +1,9 @@
 postgres:
-  host: localhost
-  port: 5432
+  host: server
+  port: 32538
   username: user
-  password: password
-  database: accounting-service
+  password: postgres
+  database: accounting
 
 nordingen:
   secret:

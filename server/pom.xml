@@ -22,4 +22,17 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.evensberget.accounting.AccountingApplicationKt</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+
 </project>

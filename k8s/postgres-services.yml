@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service3
+  labels:
+    app: postgres3
+spec:
+  type: ClusterIP
+  selector:
+    app: postgres3
+  ports:
+    - port: 5432
+      targetPort: 5432
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service3-external
+  labels:
+    app: postgres3
+spec:
+  ports:
+    - port: 5432
+      name: postgres3
+  type: NodePort
+  selector:
+    app: postgres3

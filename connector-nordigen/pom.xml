@@ -20,6 +20,10 @@
             <groupId>com.evensberget.accounting</groupId>
             <artifactId>json</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.evensberget.accounting</groupId>
+            <artifactId>database</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

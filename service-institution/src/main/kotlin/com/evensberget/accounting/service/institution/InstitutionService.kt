@@ -20,9 +20,8 @@ class InstitutionService(
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    @EventListener(ApplicationReadyEvent::class)
-    fun startup() {
-//        updateInstitutions()
+    init {
+        updateInstitutions()
     }
 
     fun updateInstitutions() {

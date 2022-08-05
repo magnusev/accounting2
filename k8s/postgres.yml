@@ -1,0 +1,91 @@
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: microk8s-hostpath
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+provisioner: microk8s.io/hostpath
+
+---
+
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: postgres-pv3
+  labels:
+    app: postgres3
+    type: local
+spec:
+  storageClassName: microk8s-hostpath
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/var/data"
+
+---
+
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: postgres-pv-claim3
+  labels:
+    app: postgres3
+spec:
+  storageClassName: microk8s-hostpath
+  capacity:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-configuration3
+  labels:
+    app: postgres3
+data:
+  POSTGRES_MULTIPLE_DATABASES: accounting
+  POSTGRES_USER: user
+  POSTGRES_PASSWORD: postgres
+
+---
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres-statefulset3
+  labels:
+    app: postgres3
+spec:
+  serviceName: "postgres3"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres3
+  template:
+    metadata:
+      labels:
+        app: postgres3
+    spec:
+      containers:
+        - name: postgres3
+          image: localhost:32000/postgres-multi-db
+          envFrom:
+            - configMapRef:
+                name: postgres-configuration3
+          ports:
+            - containerPort: 5432
+              name: postgresdb3
+          volumeMounts:
+            - name: pv-data3
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: pv-data3
+          persistentVolumeClaim:
+            claimName: postgres-pv-claim3
