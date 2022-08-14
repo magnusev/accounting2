@@ -14,6 +14,7 @@ class AccessTokenRepository(
 
     private val rowMapper = RowMapper { rs, _ ->
         AccessToken(
+            source = rs.getString("source"),
             createdAt = rs.getLocalDateTime("created_at"),
             access = rs.getString("access"),
             accessExpire = rs.getLong("access_expire"),
@@ -27,19 +28,25 @@ class AccessTokenRepository(
     private val addReplaceAccessTokenSql = """
         INSERT INTO access_token(created_at, access, access_expire,
                                  access_expire_timestamp, refresh, refresh_expire,
-                                 refresh_expire_timestamp)
+                                 refresh_expire_timestamp, source)
         VALUES (:createdAt,
                 :access,
                 :accessExpire,
                 :accessExpireTimestamp,
                 :refresh,
                 :refreshExpire,
-                :refreshExpireTimestamp)                        
+                :refreshExpireTimestamp,
+                :source)
+        ON CONFLICT (source) DO UPDATE SET created_at =:createdAt, 
+                                           access = :access,
+                                           access_expire = :accessExpire,
+                                           access_expire_timestamp = :accessExpireTimestamp,
+                                           refresh = :refresh,
+                                           refresh_expire = :refreshExpire,
+                                           refresh_expire_timestamp = :refreshExpireTimestamp
     """.trimIndent()
 
     fun addReplaceAccessToken(accessToken: AccessToken) {
-        deleteTokens()
-
         template.update(
             addReplaceAccessTokenSql,
             DbUtils.sqlParameters(
@@ -49,7 +56,8 @@ class AccessTokenRepository(
                 "accessExpireTimestamp" to accessToken.accessExpireTime,
                 "refresh" to accessToken.refresh,
                 "refreshExpire" to accessToken.refreshExpire,
-                "refreshExpireTimestamp" to accessToken.refreshExpireTime
+                "refreshExpireTimestamp" to accessToken.refreshExpireTime,
+                "source" to accessToken.source
             )
         )
     }
@@ -60,13 +68,4 @@ class AccessTokenRepository(
             rowMapper
         ).firstOrNull()
     }
-
-    private fun deleteTokens() {
-        if(getAccessToken() != null) {
-            template.query(
-                "DELETE FROM access_token", rowMapper
-            )
-        }
-    }
-
 }

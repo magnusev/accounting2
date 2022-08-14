@@ -32,6 +32,10 @@
             <groupId>com.evensberget.accounting</groupId>
             <artifactId>database</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.evensberget.accounting</groupId>
+            <artifactId>cache</artifactId>
+        </dependency>
 
 
         <!-- TEST DEPENDENCIES -->

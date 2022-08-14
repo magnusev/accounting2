@@ -1,6 +1,8 @@
 package com.evensberget.accounting.connector.nordigen.dto
 
-data class LinkRequest(
+import java.util.UUID
+
+data class RequisitionRequest(
 
     val redirect: String,
 
@@ -8,7 +10,7 @@ data class LinkRequest(
 
     val reference: String,
 
-    val agreement: String,
+    val agreement: UUID,
 
     val user_language: String = "EN",
 )

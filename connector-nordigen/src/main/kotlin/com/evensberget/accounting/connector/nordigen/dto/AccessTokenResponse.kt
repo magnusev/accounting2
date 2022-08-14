@@ -22,6 +22,7 @@ data class AccessTokenResponse(
     ) {
 
     fun toModel(): AccessToken = AccessToken(
+        source = "NORDIGEN",
         createdAt = LocalDateTime.now(),
         access = access,
         accessExpire = access_expires,

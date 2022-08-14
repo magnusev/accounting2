@@ -1,0 +1,2 @@
+ALTER TABLE access_token
+    ADD source VARCHAR UNIQUE NOT NULL

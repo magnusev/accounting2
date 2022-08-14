@@ -1,6 +1,7 @@
 package com.evensberget.accounting.service.institution.repositories
 
 import com.evensberget.accounting.common.database.DbUtils
+import com.evensberget.accounting.common.database.getUUID
 import com.evensberget.accounting.common.domain.EnduserAgreement
 import com.evensberget.accounting.connector.nordigen.dto.EndUserAgreementResponse
 import com.evensberget.accounting.service.institution.repositories.queries.EnduserAgreementQuery
@@ -50,7 +51,23 @@ class EnduserAgreementRepository(
         return EnduserAgreementQuery(template).getByNordigenId(agreement.id)
     }
 
+    fun getEnduserAgreement(userId: UUID, institutionId: UUID): EnduserAgreement? {
+        return EnduserAgreementQuery(template).getByUserIdAndInstitutionId(userId, institutionId)
+    }
+
+    fun getNordigenId(agreementId: UUID): UUID {
+        return template.query(
+            "SELECT nordigen_id FROM enduser_agreement WHERE external_id = :id",
+            DbUtils.sqlParameters("id" to agreementId)
+        ) { rs, _ -> rs.getUUID("nordigen_id") }
+            .first()
+    }
+
     private fun toSqlArray(items: List<String>): Array {
         return template.jdbcTemplate.dataSource.connection.createArrayOf("VARCHAR", items.toTypedArray())
+    }
+
+    fun getEnduserAgreementByAgreementId(userId: UUID, agreementId: UUID): EnduserAgreement {
+        return EnduserAgreementQuery(template).getByUserIdAndAgreementId(userId, agreementId)
     }
 }

@@ -1,5 +1,5 @@
 postgres:
-  host: server
+  host: 192.168.0.23
   port: 32538
   username: user
   password: postgres

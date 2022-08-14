@@ -20,6 +20,11 @@ fun <T> ResultSet.getSet(columnLabel: String): Set<T> {
         .collect(Collectors.toSet())
 }
 
+fun <T> ResultSet.getList(columnLabel: String): List<T> {
+    return Arrays.stream(this.getArray(columnLabel).array as Array<T>)
+        .collect(Collectors.toList())
+}
+
 fun ResultSet.getLocalDateTime(columnLabel: String): LocalDateTime {
     return getNullableLocalDateTime(columnLabel) ?: throw IllegalStateException("Expected $columnLabel not to be null")
 }

@@ -15,6 +15,7 @@
         <module>json</module>
         <module>domain</module>
         <module>database</module>
+        <module>cache</module>
     </modules>
 
     <dependencies>

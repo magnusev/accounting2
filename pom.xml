@@ -102,6 +102,11 @@
             </dependency>
             <dependency>
                 <groupId>com.evensberget.accounting</groupId>
+                <artifactId>cache</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.evensberget.accounting</groupId>
                 <artifactId>service-country</artifactId>
                 <version>${project.version}</version>
             </dependency>
