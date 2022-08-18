@@ -1,10 +1,12 @@
 package com.evensberget.accounting.service.institution
 
 import com.evensberget.accounting.common.cache.CacheUtils
+import com.evensberget.accounting.common.domain.Account
 import com.evensberget.accounting.common.domain.EnduserAgreement
 import com.evensberget.accounting.common.domain.Institution
 import com.evensberget.accounting.common.domain.Requisition
 import com.evensberget.accounting.connector.nordigen.NordigenConnectorService
+import com.evensberget.accounting.service.institution.repositories.AccountRepository
 import com.evensberget.accounting.service.institution.repositories.EnduserAgreementRepository
 import com.evensberget.accounting.service.institution.repositories.InstitutionRepository
 import com.evensberget.accounting.service.institution.repositories.RequisitionRepository
@@ -19,6 +21,7 @@ class InstitutionService(
     private val nordigenConnector: NordigenConnectorService,
     private val institutionRepository: InstitutionRepository,
     private val enduserAgreementRepository: EnduserAgreementRepository,
+    private val accountRepository: AccountRepository,
     private val requisitionRepository: RequisitionRepository
 ) {
 
@@ -88,6 +91,12 @@ class InstitutionService(
 
     fun getRequisition(id: UUID): Requisition {
         return requisitionRepository.get(id)
+    }
+
+    fun addAccounts(userId: UUID, accounts: List<UUID>): List<Account> {
+        return accounts.map { account ->
+            accountRepository.upsertAccount(userId, nordigenConnector.getAccount(account))
+        }
     }
 
     private data class EnduserAgreementCacheKey(

@@ -4,8 +4,10 @@ import com.evensberget.accounting.common.domain.Transaction
 import com.evensberget.accounting.common.domain.TransactionStatus
 import com.evensberget.accounting.common.json.JsonUtils
 import com.evensberget.accounting.connector.nordigen.components.NordigenAccesTokenComponent
+import com.evensberget.accounting.connector.nordigen.components.NordigenAccountsComponent
 import com.evensberget.accounting.connector.nordigen.components.NordigenAgreementsComponent
 import com.evensberget.accounting.connector.nordigen.components.NordigenRequisitionComponent
+import com.evensberget.accounting.connector.nordigen.domain.NordigenAccount
 import com.evensberget.accounting.connector.nordigen.domain.NordigenInstitution
 import com.evensberget.accounting.connector.nordigen.domain.NordigenRequisition
 import com.evensberget.accounting.connector.nordigen.dto.EndUserAgreementResponse
@@ -24,6 +26,7 @@ class NordigenConnectorService(
     private val accessToken: NordigenAccesTokenComponent,
     private val agreementsComponent: NordigenAgreementsComponent,
     private val requisitionComponent: NordigenRequisitionComponent,
+    private val accountsComponent: NordigenAccountsComponent,
     private val template: RestTemplate
 ) {
 
@@ -85,6 +88,10 @@ class NordigenConnectorService(
             .plus(nordigenTransactions.pending
                 .map { it.toTransaction(TransactionStatus.PENDING) }
             )
+    }
+
+    fun getAccount(id: UUID): NordigenAccount {
+        return accountsComponent.getAccount(id)
     }
 
     private fun getJson(): String {

@@ -16,7 +16,7 @@ open class AccountingApplication(
 ) : CommandLineRunner {
 
     override fun run(vararg args: String?) {
-//        val user = userService.get("magnus.evensberget@gmail.com")
+        val user = userService.get("magnus.evensberget@gmail.com")
 //        val institution = institutionService.getInstitutionByName("Danske Bank Private")
 //
 //        val enduserAgreement = institutionService.enduserAgreement(
@@ -34,9 +34,12 @@ open class AccountingApplication(
 //        connectorService.deleteEnduserAgreement(UUID.fromString("5341f886-cff8-443f-abdb-cc9b811da52a"))
 //        institutionService.createRequisition(user.id, enduserAgreement.id)
 
-//        val requisistion = institutionService.getRequisition(UUID.fromString("890caafe-5e3f-4fc0-b249-0159cb863079"))
+        val requisistion = institutionService.getRequisition(UUID.fromString("890caafe-5e3f-4fc0-b249-0159cb863079"))
 
-        val updatedRequisistion = institutionService.updateRequisition(UUID.fromString("890caafe-5e3f-4fc0-b249-0159cb863079"))
+//        val updatedRequisistion = institutionService.updateRequisition(UUID.fromString("890caafe-5e3f-4fc0-b249-0159cb863079"))
+        val accounts = institutionService.addAccounts(user.id, requisistion.accounts.map { UUID.fromString(it) })
+
+//        val account = connectorService.getAccount(UUID.fromString(updatedRequisistion.accounts.first()))
         println()
     }
 }
