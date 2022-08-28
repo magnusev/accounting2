@@ -1,15 +1,12 @@
 package com.evensberget.accounting.connector.nordigen
 
-import com.evensberget.accounting.common.domain.Transaction
 import com.evensberget.accounting.common.domain.TransactionStatus
 import com.evensberget.accounting.common.json.JsonUtils
 import com.evensberget.accounting.connector.nordigen.components.NordigenAccesTokenComponent
 import com.evensberget.accounting.connector.nordigen.components.NordigenAccountsComponent
 import com.evensberget.accounting.connector.nordigen.components.NordigenAgreementsComponent
 import com.evensberget.accounting.connector.nordigen.components.NordigenRequisitionComponent
-import com.evensberget.accounting.connector.nordigen.domain.NordigenAccount
-import com.evensberget.accounting.connector.nordigen.domain.NordigenInstitution
-import com.evensberget.accounting.connector.nordigen.domain.NordigenRequisition
+import com.evensberget.accounting.connector.nordigen.domain.*
 import com.evensberget.accounting.connector.nordigen.dto.EndUserAgreementResponse
 import com.evensberget.accounting.connector.nordigen.dto.InstitutionsResponse
 import com.evensberget.accounting.connector.nordigen.dto.TransactionsResponse
@@ -19,6 +16,7 @@ import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
 import java.io.File
+import java.time.LocalDate
 import java.util.*
 
 @Service
@@ -79,19 +77,27 @@ class NordigenConnectorService(
         requisitionComponent.delete(id)
     }
 
-    fun getTransactions(): List<Transaction> {
+    fun getTransactions(): List<NordigenRawTransaction> {
         val nordigenTransactions = JsonUtils.fromJson(getJson(), TransactionsResponse::class.java)
             .transactions
 
         return nordigenTransactions.booked
-            .map { it.toTransaction(TransactionStatus.BOOKED) }
+            .map { it.toRawTransaction(TransactionStatus.BOOKED) }
             .plus(nordigenTransactions.pending
-                .map { it.toTransaction(TransactionStatus.PENDING) }
+                .map { it.toRawTransaction(TransactionStatus.PENDING) }
             )
+    }
+
+    fun getTransactions(accountId: UUID, dateFrom: LocalDate? = null): List<NordigenRawTransaction> {
+        return accountsComponent.getTransactions(accountId, dateFrom)
     }
 
     fun getAccount(id: UUID): NordigenAccount {
         return accountsComponent.getAccount(id)
+    }
+
+    fun getBalances(id: UUID): List<NordigenBalance> {
+        return accountsComponent.getBalances(id)
     }
 
     private fun getJson(): String {

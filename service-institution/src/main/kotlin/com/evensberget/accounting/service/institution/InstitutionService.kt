@@ -6,10 +6,7 @@ import com.evensberget.accounting.common.domain.EnduserAgreement
 import com.evensberget.accounting.common.domain.Institution
 import com.evensberget.accounting.common.domain.Requisition
 import com.evensberget.accounting.connector.nordigen.NordigenConnectorService
-import com.evensberget.accounting.service.institution.repositories.AccountRepository
-import com.evensberget.accounting.service.institution.repositories.EnduserAgreementRepository
-import com.evensberget.accounting.service.institution.repositories.InstitutionRepository
-import com.evensberget.accounting.service.institution.repositories.RequisitionRepository
+import com.evensberget.accounting.service.institution.repositories.*
 import com.github.benmanes.caffeine.cache.Caffeine
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -22,7 +19,9 @@ class InstitutionService(
     private val institutionRepository: InstitutionRepository,
     private val enduserAgreementRepository: EnduserAgreementRepository,
     private val accountRepository: AccountRepository,
-    private val requisitionRepository: RequisitionRepository
+    private val requisitionRepository: RequisitionRepository,
+    private val balanceRepository: BalanceRepository,
+    private val rawTransactionRepository: RawTransactionRepository
 ) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -33,7 +32,7 @@ class InstitutionService(
         .build<EnduserAgreementCacheKey, EnduserAgreement>()
 
     init {
-        updateInstitutions()
+//        updateInstitutions()
     }
 
     fun updateInstitutions() {
@@ -97,6 +96,24 @@ class InstitutionService(
         return accounts.map { account ->
             accountRepository.upsertAccount(userId, nordigenConnector.getAccount(account))
         }
+    }
+
+    fun getAccounts(userId: UUID): List<Account> {
+        return accountRepository.getAccountsForUser(userId)
+    }
+
+    fun updateBalances(accountId: UUID) {
+        val nordigenAccountId = accountRepository.getNordigenId(accountId)
+        val balances = nordigenConnector.getBalances(nordigenAccountId)
+        balanceRepository.upsertBalances(accountId, balances)
+    }
+
+    fun updateTransactions(accountId: UUID) {
+        val latestBookingDate = rawTransactionRepository.getLatestBookingDate(accountId)
+        val nordigenAccountId = accountRepository.getNordigenId(accountId)
+
+        val transactions = nordigenConnector.getTransactions(nordigenAccountId, latestBookingDate)
+        rawTransactionRepository.upsertTransactions(accountId, transactions)
     }
 
     private data class EnduserAgreementCacheKey(

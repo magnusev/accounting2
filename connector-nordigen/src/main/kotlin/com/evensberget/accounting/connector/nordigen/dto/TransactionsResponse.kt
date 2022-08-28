@@ -1,19 +1,21 @@
 package com.evensberget.accounting.connector.nordigen.dto
 
 import com.evensberget.accounting.common.domain.*
+import com.evensberget.accounting.connector.nordigen.domain.NordigenRawTransaction
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.time.LocalDate
+import java.util.*
 
 data class TransactionsResponse(
     @JsonProperty("transactions") val transactions: TransactionsInner
 )
 
 data class TransactionsInner(
-    @JsonProperty("booked") val booked: List<NordigenTransaction>,
-    @JsonProperty("pending") val pending: List<NordigenTransaction>
+    @JsonProperty("booked") val booked: List<NordigenTransactionResponse>,
+    @JsonProperty("pending") val pending: List<NordigenTransactionResponse>
 )
 
-data class NordigenTransaction(
+data class NordigenTransactionResponse(
     @JsonProperty("additionalInformation") val additionalInformation: String,
     @JsonProperty("bookingDate") val bookingDate: LocalDate,
     @JsonProperty("creditorName") val creditorName: String?,
@@ -30,6 +32,7 @@ data class NordigenTransaction(
 
     fun toTransaction(status: TransactionStatus): Transaction {
         return Transaction(
+            id = UUID.randomUUID(),
             date = bookingDate,
             description = getDescription().removeIllegalCharacters(),
             amount = CurrencyAmount(
@@ -41,7 +44,7 @@ data class NordigenTransaction(
             status = status,
             type = type(),
             source = source(),
-            rawTransaction = toRawTransaction()
+            rawTransaction = null
         )
     }
 
@@ -80,8 +83,9 @@ data class NordigenTransaction(
         return entryReference
     }
 
-    private fun toRawTransaction(): RawTransaction {
-        return RawTransaction(
+    fun toRawTransaction(status: TransactionStatus): NordigenRawTransaction {
+        return NordigenRawTransaction(
+            status = status,
             additionalInformation = additionalInformation.removeIllegalCharacters(),
             bookingDate = bookingDate,
             creditorName = creditorName,
@@ -107,7 +111,7 @@ data class NordigenTransaction(
 }
 
 data class NordigenCurrencyExchange(
-    @JsonProperty("exchangeRate") val exchangeRate: String,
+    @JsonProperty("exchangeRate") val exchangeRate: Double,
     @JsonProperty("instructedAmount") val instructedAmount: NordigenTransactionAmount,
     @JsonProperty("sourceCurrency") val sourceCurrency: String,
     @JsonProperty("targetCurrency") val targetCurrency: String,
@@ -127,7 +131,7 @@ data class NordigenCurrencyExchange(
 
 
 data class NordigenTransactionAmount(
-    @JsonProperty("amount") val amount: String,
+    @JsonProperty("amount") val amount: Double,
     @JsonProperty("currency") val currency: String
 ) {
 

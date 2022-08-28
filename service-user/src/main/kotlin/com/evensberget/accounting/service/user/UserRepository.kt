@@ -27,13 +27,16 @@ class UserRepository(
         ON CONFLICT (email) DO NOTHING
     """.trimIndent()
 
-    fun upsert(email: String) {
+    fun upsert(email: String): User {
         template.update(
             upsertSql, DbUtils.sqlParameters(
                 "externalId" to UUID.randomUUID(),
                 "email" to email
             )
         )
+
+        return get(email)
+            ?: throw IllegalStateException("Expected User with email $email to exist")
     }
 
     fun get(email: String): User? {

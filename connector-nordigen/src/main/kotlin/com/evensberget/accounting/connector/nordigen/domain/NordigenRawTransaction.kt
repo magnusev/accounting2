@@ -1,11 +1,11 @@
-package com.evensberget.accounting.common.domain
+package com.evensberget.accounting.connector.nordigen.domain
 
+import com.evensberget.accounting.common.domain.CurrencyAmount
+import com.evensberget.accounting.common.domain.CurrencyExchange
+import com.evensberget.accounting.common.domain.TransactionStatus
 import java.time.LocalDate
-import java.util.*
 
-data class RawTransaction(
-    val id: UUID,
-    val accountId: UUID,
+data class NordigenRawTransaction(
     val status: TransactionStatus,
     val additionalInformation: String,
     val bookingDate: LocalDate,
@@ -19,12 +19,4 @@ data class RawTransaction(
     val transactionAmount: CurrencyAmount,
     val transactionId: String,
     val valueDate: LocalDate
-)
-
-data class CurrencyExchange(
-    val exchangeRate: Double,
-    val instructedAmount: CurrencyAmount,
-    val sourceCurrency: String,
-    val targetCurrency: String,
-    val unitCurrency: String
 )

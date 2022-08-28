@@ -65,6 +65,7 @@ class AccountRepositoryTest : FunSpec({
                 created = LocalDateTime.now(),
                 lastAccessed = LocalDateTime.now(),
                 institutionId = "TEST",
+                name = "TEST_NAME",
                 status = "TEST",
                 owner = "TEST!",
                 resourceId = "TEST",

@@ -1,13 +1,19 @@
 package com.evensberget.accounting.connector.nordigen.components
 
+import com.evensberget.accounting.common.domain.TransactionStatus
 import com.evensberget.accounting.connector.nordigen.domain.NordigenAccount
+import com.evensberget.accounting.connector.nordigen.domain.NordigenBalance
+import com.evensberget.accounting.connector.nordigen.domain.NordigenRawTransaction
+import com.evensberget.accounting.connector.nordigen.dto.TransactionsResponse
 import com.fasterxml.jackson.annotation.JsonProperty
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
@@ -17,6 +23,7 @@ class NordigenAccountsComponent(
     private val template: RestTemplate
 ) {
 
+    private val logger = LoggerFactory.getLogger(javaClass)
     private val baseUrl = "https://ob.nordigen.com/api/v2/accounts/"
 
     fun getAccount(id: UUID): NordigenAccount {
@@ -39,6 +46,39 @@ class NordigenAccountsComponent(
             cashAccountType = details.cashAccountType
         )
     }
+
+    fun getBalances(id: UUID): List<NordigenBalance> {
+        val url = UriComponentsBuilder.fromUriString(baseUrl)
+            .pathSegment(id.toString(), "balances")
+            .toUriString()
+
+        val entity: HttpEntity<Void> = HttpEntity(getHeaders())
+
+        return template.exchange(url, HttpMethod.GET, entity, BalanceResponseWrapper::class.java).body.balances
+    }
+
+    fun getTransactions(accountId: UUID, dateFrom: LocalDate?): List<NordigenRawTransaction> {
+        logger.info("getting transaction for account $accountId from $dateFrom")
+
+        val urlBuilder = UriComponentsBuilder.fromUriString(baseUrl)
+            .pathSegment(accountId.toString(), "transactions")
+
+        if (dateFrom != null) {
+            val dateString = "${dateFrom.year}-${dateFrom.monthValue}-${dateFrom.dayOfMonth}"
+            urlBuilder.queryParam("date_from", dateString)
+        }
+
+        val url = urlBuilder.toUriString()
+
+        val entity: HttpEntity<Void> = HttpEntity(getHeaders())
+
+        val data = template.exchange(url, HttpMethod.GET, entity, TransactionsResponse::class.java).body.transactions
+
+        return data.booked.map { it.toRawTransaction(TransactionStatus.BOOKED) }
+            .plus(data.pending.map { it.toRawTransaction(TransactionStatus.PENDING) })
+
+    }
+
 
     private fun getAccountBasic(id: UUID): AccountResponse {
         val url = UriComponentsBuilder.fromUriString(baseUrl)
@@ -69,6 +109,10 @@ class NordigenAccountsComponent(
 
         return headers
     }
+
+    private data class BalanceResponseWrapper(
+        @JsonProperty("balances") val balances: List<NordigenBalance>
+    )
 
     private data class AccountResponse(
         @JsonProperty("id") val id: UUID,

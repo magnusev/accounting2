@@ -4,7 +4,7 @@ import java.time.LocalDate
 import java.util.*
 
 data class Transaction(
-    val id: UUID = UUID.randomUUID(),
+    val id: UUID,
     val date: LocalDate,
     val description: String,
     val category: String = "UNKNOWN",

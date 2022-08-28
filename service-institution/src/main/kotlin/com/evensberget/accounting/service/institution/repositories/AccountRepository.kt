@@ -91,6 +91,31 @@ class AccountRepository(
         return getByNordigenId(nordigenAccount.id)
     }
 
+    fun getAccountsForUser(userId: UUID): List<Account> {
+        val sql = """
+            SELECT account.external_id      as id,
+                   user_account.external_id as user_id,
+                   institution.external_id  as institution_id,
+                   created,
+                   last_accessed,
+                   status,
+                   owner,
+                   account.name as name,
+                   resource_id,
+                   iban,
+                   bban,
+                   currency,
+                   product,
+                   cash_account_type
+            FROM account
+                     INNER JOIN institution on institution.id = account.institution_id
+                     INNER JOIN user_account on user_account.id = account.user_id
+            WHERE user_account.external_id = :userId
+        """.trimIndent()
+
+        return template.query(sql, DbUtils.sqlParameters("userId" to userId), rowMapper)
+    }
+
     private fun getByNordigenId(id: UUID): Account {
         val sql = """
             SELECT account.external_id      as id,
@@ -114,6 +139,14 @@ class AccountRepository(
         """.trimIndent()
 
         return template.query(sql, DbUtils.sqlParameters("id" to id), rowMapper)
+            .first()
+    }
+
+    fun getNordigenId(accountId: UUID): UUID {
+        return template.query(
+            "SELECT nordigen_id FROM account where external_id = :accountId",
+            DbUtils.sqlParameters("accountId" to accountId)
+        ) { rs, _ -> rs.getUUID("nordigen_id") }
             .first()
     }
 
