@@ -32,6 +32,9 @@ class RuleEngine {
                 "creditor_name" -> {
                     checkedEntries[entry] = stringCompare(entry.operation, transaction.creditorName, entry.fieldValue)
                 }
+                "remittanceInformationUnstructured" -> {
+                    checkedEntries[entry] = stringCompare(entry.operation, transaction.remittanceInformationUnstructured, entry.fieldValue)
+                }
                 else -> throw UnsupportedOperationException("Field with name ${entry.rawTransactionFieldName} is not supported")
             }
         }

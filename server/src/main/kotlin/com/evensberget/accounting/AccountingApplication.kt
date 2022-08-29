@@ -51,7 +51,7 @@ open class AccountingApplication(
 
         val a = transactions.map { ruleService.applyRule(user.id, it) }
         institutionService.updateTransactions(a)
-        println()
+        println("DONE!")
     }
 }
 
