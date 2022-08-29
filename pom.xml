@@ -13,6 +13,7 @@
         <module>service-institution</module>
         <module>service-user</module>
         <module>test</module>
+        <module>service-rule</module>
     </modules>
     <groupId>com.evensberget.accounting</groupId>
     <version>1.0-SNAPSHOT</version>
@@ -118,6 +119,11 @@
             <dependency>
                 <groupId>com.evensberget.accounting</groupId>
                 <artifactId>service-user</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.evensberget.accounting</groupId>
+                <artifactId>service-rule</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

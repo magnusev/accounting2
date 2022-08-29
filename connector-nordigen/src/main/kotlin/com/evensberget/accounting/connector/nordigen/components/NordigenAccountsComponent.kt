@@ -64,7 +64,8 @@ class NordigenAccountsComponent(
             .pathSegment(accountId.toString(), "transactions")
 
         if (dateFrom != null) {
-            val dateString = "${dateFrom.year}-${dateFrom.monthValue}-${dateFrom.dayOfMonth}"
+            val d = dateFrom.minusWeeks(1)
+            val dateString = "${d.year}-${d.monthValue}-${d.dayOfMonth}"
             urlBuilder.queryParam("date_from", dateString)
         }
 

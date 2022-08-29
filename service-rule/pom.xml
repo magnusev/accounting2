@@ -9,34 +9,19 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>server</artifactId>
-
+    <artifactId>service-rule</artifactId>
     <dependencies>
         <dependency>
             <groupId>com.evensberget.accounting</groupId>
-            <artifactId>service-institution</artifactId>
+            <artifactId>domain</artifactId>
         </dependency>
         <dependency>
             <groupId>com.evensberget.accounting</groupId>
-            <artifactId>service-user</artifactId>
+            <artifactId>database</artifactId>
         </dependency>
         <dependency>
             <groupId>com.evensberget.accounting</groupId>
-            <artifactId>service-rule</artifactId>
+            <artifactId>cache</artifactId>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <mainClass>com.evensberget.accounting.AccountingApplicationKt</mainClass>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
-
 </project>

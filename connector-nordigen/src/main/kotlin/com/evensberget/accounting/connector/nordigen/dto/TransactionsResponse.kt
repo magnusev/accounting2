@@ -1,10 +1,12 @@
 package com.evensberget.accounting.connector.nordigen.dto
 
-import com.evensberget.accounting.common.domain.*
+import com.evensberget.accounting.common.domain.CurrencyAmount
+import com.evensberget.accounting.common.domain.CurrencyExchange
+import com.evensberget.accounting.common.domain.TransactionStatus
+import com.evensberget.accounting.common.domain.TransactionType
 import com.evensberget.accounting.connector.nordigen.domain.NordigenRawTransaction
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.time.LocalDate
-import java.util.*
 
 data class TransactionsResponse(
     @JsonProperty("transactions") val transactions: TransactionsInner
@@ -29,24 +31,6 @@ data class NordigenTransactionResponse(
     @JsonProperty("transactionId") val transactionId: String,
     @JsonProperty("valueDate") val valueDate: LocalDate
 ) {
-
-    fun toTransaction(status: TransactionStatus): Transaction {
-        return Transaction(
-            id = UUID.randomUUID(),
-            date = bookingDate,
-            description = getDescription().removeIllegalCharacters(),
-            amount = CurrencyAmount(
-                amount = transactionAmount.amount,
-                currency = transactionAmount.currency
-            ),
-            details = remittanceInformationUnstructured.removeIllegalCharacters(),
-            account = -1,
-            status = status,
-            type = type(),
-            source = source(),
-            rawTransaction = null
-        )
-    }
 
     private fun getDescription(): String {
         return if (creditorName != null) creditorName

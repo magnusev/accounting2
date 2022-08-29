@@ -29,8 +29,8 @@ class RawTransactionRepository(
 
     private val rowMapper = RowMapper { rs, _ ->
         RawTransaction(
-            id = rs.getUUID("id"),
-            accountId = rs.getUUID("account_id"),
+            id = rs.getUUID("external_id"),
+            accountId = rs.getUUID("external_account_id"),
             status = TransactionStatus.valueOf(rs.getString("status")),
             additionalInformation = rs.getString("additional_information"),
             bookingDate = rs.getLocalDate("booking_date"),
@@ -130,6 +130,21 @@ class RawTransactionRepository(
         template.batchUpdate(upsertSql, params)
     }
 
+    fun getRawTransactionsForUser(userId: UUID): List<RawTransaction> {
+        val sql = """
+            SELECT *,
+                   (SELECT account.external_id FROM account WHERE id = raw_transaction.account_id) as external_account_id
+            FROM raw_transaction
+            WHERE account_id IN (SELECT account.id
+                                 FROM account
+                                          INNER JOIN user_account on user_account.id = account.user_id
+                                 WHERE user_account.external_id = :userId)
+        """.trimIndent()
+
+
+        return template.query(sql, DbUtils.sqlParameters("userId" to userId), rowMapper)
+    }
+
     fun getLatestBookingDate(accountId: UUID): LocalDate? {
         val sql = """
             SELECT max(booking_date) AS booking_date
@@ -147,6 +162,8 @@ class RawTransactionRepository(
 
     private fun ResultSet.getCurrencyExchange(): CurrencyExchange? {
         val exchangeRate = getDouble("exchange_rate") ?: return null
+
+        if(exchangeRate == null || exchangeRate == 0.0) return null
 
         return CurrencyExchange(
             exchangeRate = exchangeRate,

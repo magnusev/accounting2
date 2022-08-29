@@ -1,10 +1,7 @@
 package com.evensberget.accounting.service.institution
 
 import com.evensberget.accounting.common.cache.CacheUtils
-import com.evensberget.accounting.common.domain.Account
-import com.evensberget.accounting.common.domain.EnduserAgreement
-import com.evensberget.accounting.common.domain.Institution
-import com.evensberget.accounting.common.domain.Requisition
+import com.evensberget.accounting.common.domain.*
 import com.evensberget.accounting.connector.nordigen.NordigenConnectorService
 import com.evensberget.accounting.service.institution.repositories.*
 import com.github.benmanes.caffeine.cache.Caffeine
@@ -21,7 +18,8 @@ class InstitutionService(
     private val accountRepository: AccountRepository,
     private val requisitionRepository: RequisitionRepository,
     private val balanceRepository: BalanceRepository,
-    private val rawTransactionRepository: RawTransactionRepository
+    private val rawTransactionRepository: RawTransactionRepository,
+    private val transactionRepository: TransactionRepository
 ) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -108,12 +106,20 @@ class InstitutionService(
         balanceRepository.upsertBalances(accountId, balances)
     }
 
-    fun updateTransactions(accountId: UUID) {
+    fun updateRawTransactions(accountId: UUID) {
         val latestBookingDate = rawTransactionRepository.getLatestBookingDate(accountId)
         val nordigenAccountId = accountRepository.getNordigenId(accountId)
 
         val transactions = nordigenConnector.getTransactions(nordigenAccountId, latestBookingDate)
         rawTransactionRepository.upsertTransactions(accountId, transactions)
+    }
+
+    fun updateTransactions(transactions: List<Transaction>) {
+        transactionRepository.upsertTransactions(transactions)
+    }
+
+    fun getRawTransactionsForUser(userId: UUID): List<RawTransaction> {
+        return rawTransactionRepository.getRawTransactionsForUser(userId)
     }
 
     private data class EnduserAgreementCacheKey(

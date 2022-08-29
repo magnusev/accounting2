@@ -2,6 +2,7 @@ package com.evensberget.accounting
 
 import com.evensberget.accounting.connector.nordigen.NordigenConnectorService
 import com.evensberget.accounting.service.institution.InstitutionService
+import com.evensberget.accounting.service.rule.RuleService
 import com.evensberget.accounting.service.user.UserService
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -11,7 +12,8 @@ import org.springframework.boot.runApplication
 open class AccountingApplication(
     private val userService: UserService,
     private val connectorService: NordigenConnectorService,
-    private val institutionService: InstitutionService
+    private val institutionService: InstitutionService,
+    private val ruleService: RuleService
 ) : CommandLineRunner {
 
     override fun run(vararg args: String?) {
@@ -40,12 +42,15 @@ open class AccountingApplication(
 //        connectorService.getBalances(UUID.fromString("8472c8ca-ce41-4d0a-969e-b839ca690d9c"))
 //        val account = connectorService.getAccount(UUID.fromString(updatedRequisistion.accounts.first()))
 //        val accounts = institutionService.getAccounts(user.id)
-//
+
 //        accounts.forEach { account ->
 //            institutionService.updateTransactions(accountId = account.id)
 //        }
 
+        val transactions = institutionService.getRawTransactionsForUser(user.id)
 
+        val a = transactions.map { ruleService.applyRule(user.id, it) }
+        institutionService.updateTransactions(a)
         println()
     }
 }

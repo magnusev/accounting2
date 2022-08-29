@@ -46,7 +46,8 @@ class RequisitionRepository(
                                                 ssn                = :ssn,
                                                 account_selection  = :accountSelection,
                                                 redirect_immediate = :redirectImmediate,
-                                                accounts           = :accounts
+                                                accounts           = :accounts,
+                                                modified           = current_timestamp
     """.trimIndent()
 
     fun upsertRequisition(

@@ -13,10 +13,10 @@ data class Transaction(
     val details: String,
     val tags: Set<String> = emptySet(),
     val notes: String? = null,
-    val account: Int,
+    val accountId: UUID,
     val ignored: Boolean = false,
     val status: TransactionStatus,
     val type: TransactionType,
     val source: String,
-    val rawTransaction: RawTransaction? = null
+    val rawTransactionId: UUID
 )
